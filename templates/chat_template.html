@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal RAG Service Manual Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔧</text></svg>">
+</head>
+<body>
+    <div class="main-container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1>🔧 Multimodal RAG Assistant</h1>
+                <p>Advanced service manual analysis with text, tables, and diagrams</p>
+                <div class="feature-badges">
+                    <span class="badge">📄 Text</span>
+                    <span class="badge">📊 Tables</span>
+                    <span class="badge">🖼️ Diagrams</span>
+                    <span class="badge">🔍 Auto-Search</span>
+                </div>
+            </div>
+            
+            <div class="upload-section">
+                <div class="file-input-wrapper">
+                    <input type="file" id="pdfFile" class="file-input" accept=".pdf" aria-label="Choose PDF file">
+                    <label for="pdfFile" class="file-input-label">📄 Choose PDF</label>
+                </div>
+                <button id="uploadButton" class="upload-button" aria-label="Upload PDF" disabled>Upload</button>
+                <div class="file-info" id="fileInfo">No file selected</div>
+                <button id="autoSearchButton" class="auto-search-button" aria-label="Toggle auto-search">
+                    🔍 Auto-Search: <span id="autoSearchStatus">ON</span>
+                </button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+                <div class="message system-message">
+                    <div class="system-icon">🎉</div>
+                    <div class="system-content">
+                        <strong>Welcome to Multimodal RAG Assistant!</strong><br>
+                        Upload service manuals with complex tables and diagrams, or ask technical questions. 
+                        I can analyze text, extract table data, read diagrams with OCR, and search Google for missing manuals automatically.
+                        <div class="example-queries">
+                            <div class="example-title">Try asking:</div>
+                            <div class="example-chips">
+                                <span class="example-chip" onclick="setExampleQuery(this)">Show me the wiring diagram for the compressor</span>
+                                <span class="example-chip" onclick="setExampleQuery(this)">What are the torque specifications?</span>
+                                <span class="example-chip" onclick="setExampleQuery(this)">Parts breakdown for model XYZ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator" role="status" aria-live="polite">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span>AI is analyzing multimodal content...</span>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" aria-label="Chat message" 
+                       placeholder="Ask about specifications, diagrams, procedures, or upload a manual..." maxlength="1000">
+                <button id="sendButton" aria-label="Send message" disabled>
+                    <span class="send-icon">📤</span>
+                    Send
+                </button>
+            </div>
+        </div>
+        
+        <div class="processing-panel">
+            <div class="processing-header">
+                <div class="header-title">
+                    <span class="header-icon">🔄</span>
+                    <span>Multimodal Processing</span>
+                </div>
+                <div class="header-subtitle">Real-time content analysis</div>
+            </div>
+            
+            <div class="processing-content" id="processingContent">
+                <div class="stats-section">
+                    <div class="stats-title">📊 Content Database</div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon">📄</div>
+                            <div class="stat-details">
+                                <div class="stat-label">Text Blocks</div>
+                                <div class="stat-value" id="textCount">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-details">
+                                <div class="stat-label">Tables</div>
+                                <div class="stat-value" id="tableCount">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">🖼️</div>
+                            <div class="stat-details">
+                                <div class="stat-label">Figures</div>
+                                <div class="stat-value" id="figureCount">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-details">
+                                <div class="stat-label">Total</div>
+                                <div class="stat-value" id="totalCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="processingSteps"></div>
+                
+                <div class="retrieved-chunks" id="retrievedChunks" style="display: none;">
+                    <div class="chunks-title">🔍 Retrieved Content</div>
+                    <div class="chunks-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Processing multimodal content...</div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
